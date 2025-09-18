@@ -1,36 +1,12 @@
 const express = require("express")
-
+const { userRouter } = require("./routes/user")
+const { courseRouter } = require("./routes/course")
 const app = express()
 
-app.post("/user/signup", function(req, res){
-    res.json({
-        message: "You are signed up"
-    })
-})
+app.use("/user", userRouter)
+app.use("/courses", courseRouter)
 
-app.post("/user/signin", function(req, res){
-    res.json({
-        message: "You are logged in"
-    })
-})
 
-app.post("/user/purchases", function(req, res){
-    res.json({
-        message: "user "
-    })
-})
-
-app.post("/courses", function(req, res){
-    res.json({
-        message: "You are signed up"
-    })
-})
-
-app.post("/courses/purchase", function(req, res){
-    res.json({
-        message: "You are signed up"
-    })
-})
 
 
 app.listen(3000)
