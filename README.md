@@ -215,6 +215,8 @@
   ## Step-5
   - defining the Schema in db.js and connecting to mongoose in index.js
 
+  ![image alt](https://github.com/Bishwa7/Course-Selling-app/blob/09183f8064409917beb08a625073fa3fb0a465e9/images/Screenshot-(db-Schema).png)
+
   ```javascript
     const mongoose = require("mongoose")
     const Schema = mongoose.Schema
