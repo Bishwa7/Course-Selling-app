@@ -532,6 +532,132 @@
   ```
 
   ## Step-7
+  - added .env for environment variables, auth middleware for user and admin & updated admin course endpoint in admin.js
+  - added config.js which imports environment variables from .env and then exports it to every other file
+
+  .env.example
+  ```
+    MONGO_URL = mongodb+srv://admin300:L8BjscdsghjHVjjsfNNjksf@cluster0.c50lnwj.mongodb.net/course-db
+    JWT_SECRET_ADMIN = Brothergetyourownpasswordandproject
+    JWT_SECRET_USER = Dudegetyourownpasswordandproject
+
+  ```
+
+
+  middleware/userAuth.js
+  ```javascript
+    const jwt = require("jsonwebtoken")
+    const { JWT_SECRET_USER } = require("../config")
+
+    function userMiddleware(req, res, next){
+        const token = req.headers.token;
+
+        if(token)
+        {
+            jwt.verify(token, JWT_SECRET_USER, (err, decoded)=>{
+                if(err)
+                {
+                    res.status(401).send({
+                        message: "unauthorized1"
+                    })
+                }
+                else{
+                    req.userId = decoded.id;
+                    next();
+                }
+            })
+        }
+        else{
+            res.status(401).send({
+                message: "unauthorized2"
+            })
+        }
+    }
+
+
+    module.exports = {
+        userMiddleware
+    }
+  ```
+
+  middleware/adminAuth.js
+  ```javascript
+    const jwt = require("jsonwebtoken")
+    const { JWT_SECRET_ADMIN } = require("../config")
+
+    function adminMiddleware(req, res, next){
+        const token = req.headers.token;
+
+        if(token)
+        {
+            jwt.verify(token, JWT_SECRET_ADMIN, (err, decoded)=>{
+                if(err)
+                {
+                    res.status(401).send({
+                        message: "unauthorized1"
+                    })
+                }
+                else{
+                    req.adminId = decoded.id;
+                    next();
+                }
+            })
+        }
+        else{
+            res.status(401).send({
+                message: "unauthorized2"
+            })
+        }
+    }
+
+
+    module.exports = {
+        adminMiddleware
+    }
+  ```
+
+
+  admin.js
+  ```javascript
+    const { adminMiddleware } = require("../middleware/adminAuth")
+    const { JWT_SECRET_ADMIN } = require("../config")
+
+
+    adminRouter.post("/course", adminMiddleware, async function(req, res){
+        const adminId = req.adminId;
+
+        const { title, description, price, imageUrl } = req.body;
+
+        const course = await courseModel.create({
+            title , description, price, imageUrl, creatorId: adminId 
+        })
+
+        res.json({
+            message: "Course created",
+            courseId: courseModel._id
+        })
+    })
+
+
+
+  ```
+
+
+  config.js
+  ```javascript
+    require("dotenv").config()
+
+    const JWT_SECRET_ADMIN = process.env.JWT_SECRET_ADMIN;     //admin jwt is diff to user jwt
+
+    const JWT_SECRET_USER = process.env.JWT_SECRET_USER;    //user jwt is diff from admin jwt
+
+
+    module.exports = {
+        JWT_SECRET_ADMIN,
+        JWT_SECRET_USER
+    }
+    
+  ```
 
 
   ## Step-8

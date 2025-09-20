@@ -1,14 +1,14 @@
 const { Router } = require("express")
 const adminRouter = Router();
-const { adminModel } = require("../db")
+const { adminModel, courseModel } = require("../db")
+const { adminMiddleware } = require("../middleware/adminAuth")
 
 const {z} = require("zod")
 const bcrypt = require("bcrypt")
 
 
 const jwt = require("jsonwebtoken")
-const JWT_SECRET_ADMIN = "adminjwtisdifftouserjwt"    //admin jwt is diff to user jwt
-
+const { JWT_SECRET_ADMIN } = require("../config")
 
 
 
@@ -103,9 +103,20 @@ adminRouter.post("/signin", async function(req, res){
 
 
 
-adminRouter.post("/course", function(req, res){
+
+
+adminRouter.post("/course", adminMiddleware, async function(req, res){
+    const adminId = req.adminId;
+
+    const { title, description, price, imageUrl } = req.body;
+
+    const course = await courseModel.create({
+        title , description, price, imageUrl, creatorId: adminId 
+    })
+
     res.json({
-        message: "create course(admin)"
+        message: "Course created",
+        courseId: courseModel._id
     })
 })
 
