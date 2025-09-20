@@ -103,7 +103,7 @@ adminRouter.post("/signin", async function(req, res){
 
 
 
-
+// create course endpoint
 
 adminRouter.post("/course", adminMiddleware, async function(req, res){
     const adminId = req.adminId;
@@ -116,24 +116,74 @@ adminRouter.post("/course", adminMiddleware, async function(req, res){
 
     res.json({
         message: "Course created",
-        courseId: courseModel._id
+        courseId: course._id
     })
 })
 
 
 
-adminRouter.put("/course", function(req, res){
+
+// update course endpoint
+
+adminRouter.put("/course", adminMiddleware, async function(req, res){
+
+    
+    const adminId = req.adminId;
+
+    const { title, description, price, imageUrl, courseId } = req.body;
+
+    const course = await courseModel.updateOne({
+        _id: courseId,
+        creatorId: adminId
+    },{
+        title: title,
+        description: description,
+        price: price,
+        imageUrl: imageUrl
+    })
+
+    // console.log(course)
+
+    if(course.modifiedCount)
+    {
+        res.json({
+            message: "Course updated",
+            courseId: course._id
+        })
+    }
+    else{
+        res.json({
+            message: "Cannot update other creator course"
+        })
+    }
+    
+})
+
+
+
+
+// get all courses created by the logged in admin
+
+adminRouter.get("/content", adminMiddleware, async function(req, res){
+    const adminId = req.adminId;
+
+    //const { title, description, price, imageUrl, courseId } = req.body;
+
+    const courses = await courseModel.find({
+        creatorId: adminId
+    })
+
     res.json({
-        message: "create course(admin)"
+        message: "Course created",
+        courses: courses
     })
 })
 
 
-adminRouter.get("/content", function(req, res){
-    res.json({
-        message: "course content(admin)"
-    })
-})
+
+
+
+
 
 module.exports = {
     adminRouter: adminRouter

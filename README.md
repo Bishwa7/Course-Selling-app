@@ -661,6 +661,92 @@
 
 
   ## Step-8
+  - added course creation, updation and getting all course endpoint for admin in admin.js
+
+  
+  admin.js
+  ```javascript
+  
+    // create course endpoint
+
+    adminRouter.post("/course", adminMiddleware, async function(req, res){
+        const adminId = req.adminId;
+
+        const { title, description, price, imageUrl } = req.body;
+
+        const course = await courseModel.create({
+            title , description, price, imageUrl, creatorId: adminId 
+        })
+
+        res.json({
+            message: "Course created",
+            courseId: course._id
+        })
+    })
+
+
+
+
+    // update course endpoint
+
+    adminRouter.put("/course", adminMiddleware, async function(req, res){
+
+        
+        const adminId = req.adminId;
+
+        const { title, description, price, imageUrl, courseId } = req.body;
+
+        const course = await courseModel.updateOne({
+            _id: courseId,
+            creatorId: adminId
+        },{
+            title: title,
+            description: description,
+            price: price,
+            imageUrl: imageUrl
+        })
+
+        // console.log(course)
+
+        if(course.modifiedCount)
+        {
+            res.json({
+                message: "Course updated",
+                courseId: course._id
+            })
+        }
+        else{
+            res.json({
+                message: "Cannot update other creator course"
+            })
+        }
+        
+    })
+
+
+
+
+    // get all courses created by the logged in admin
+
+    adminRouter.get("/content", adminMiddleware, async function(req, res){
+        const adminId = req.adminId;
+
+        //const { title, description, price, imageUrl, courseId } = req.body;
+
+        const courses = await courseModel.find({
+            creatorId: adminId
+        })
+
+        res.json({
+            message: "Course created",
+            courses: courses
+        })
+    })
+
+
+
+
+  ```
 
 
   ## Step-9
