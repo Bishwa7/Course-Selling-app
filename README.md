@@ -29,7 +29,7 @@ Course Selling App – Backend Backend for a course selling platform built using
 ## Installation
 ```
     # Clone the repository
-    git clone https://github.com/Zac1aN/QuickBazaar.git
+    git clone https://github.com/Bishwa7/Course-Selling-app.git
 
     # Navigate to the project directory
     cd Course-Selling-app
