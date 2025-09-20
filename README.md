@@ -1,5 +1,10 @@
 # Course-Selling-app
 
+
+Course Selling App – Backend Backend for a course selling platform built using MongoDB, Express.js, and Node.js. It handles user authentication, course creation and management and order processing. The backend includes role-based access control for students and admins, along with JWT-based authentication and MongoDB for data persistence.
+
+
+## Steps and features in the project
  - Initialize a new Node.js project
  - Add Express, jsonwebtoken, mongoose to it as a dependency 
  - Create index.js
@@ -12,13 +17,44 @@
  - Create the frontend
 
 
- Good to haves
+ Good to haves (coming soon)
   - Use cookies instead of JWT for auth
   - Add a rate limiting middleware
   - Frontend in ejs (low pri)
   - Frontend in React
 
 
+
+
+## Installation
+```
+    # Clone the repository
+    git clone https://github.com/Zac1aN/QuickBazaar.git
+
+    # Navigate to the project directory
+    cd Course-Selling-app
+
+    # Install dependencies
+    npm install
+
+    # Check .env.example and create .env by yourself
+
+    # Start the development server
+    npm run start
+```
+
+
+## Tech Stack
+
+- Backend: Node.js, Express.js
+- DataBase: MongoDB
+- Authentication: JWT
+
+
+
+
+
+## Commits made in serial order (Steps) -
 
   ## Step-1
   - initial commit
@@ -750,6 +786,98 @@
 
 
   ## Step-9
+  - added preview and purchase endpoint in course.js
+    - preview for viewing all courses in the app
+    - purchase for puchasing a course 
+
+  - added purchases endpoint in user.js (to view puchased courses)
+
+  course.js
+  ```javascript
+
+    const { Router } = require("express")
+
+    const courseRouter = Router();
+    const { userMiddleware } = require("../middleware/userAuth");
+    const { purchaseModel, courseModel } = require("../db");
+
+
+    courseRouter.get("/preview", async function(req, res){
+
+        const courses = await courseModel.find({})
+
+        res.json({
+            courses
+        })
+    })
+
+    courseRouter.post("/purchase", userMiddleware, async function(req, res){
+
+        const userId = req.userId;
+        const courseId = req.body.courseId;
+
+
+        const course  = await purchaseModel.findOne({
+            userId,
+            courseId
+        })
+
+        console.log(course)
+
+        if(!course){
+
+            // here we should 1st check if the user paid the price
+            await purchaseModel.create({
+                userId,
+                courseId
+            })
+
+            res.json({
+                message: "Course Purchased"
+            })
+        }
+        else{
+            res.json({
+                message: "Course Already Purchased"
+            })
+        }
+    })
+
+
+    module.exports = {
+        courseRouter: courseRouter
+    }
+  ```
+
+  user.js
+  ```javascript
+
+    userRouter.get("/purchases", userMiddleware, async function(req, res){
+
+        const userId = req.userId;
+
+        const purchases = await purchaseModel.find({
+            userId
+        })
+
+
+        const coursesData = await courseModel.find({
+            _id: {$in: purchases.map(x => x.courseId)}
+        })
+
+
+
+
+        res.json({
+            purchases,
+            coursesData
+        })
+    })
+
+
+  ```
+
+
 
 
   ## Step10
